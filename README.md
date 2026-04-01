@@ -13,7 +13,7 @@ An interactive color palette tool inspired by *A Dictionary of Color Combination
 
 No dependencies. Open `index.html` in a browser.
 
-Or view it live: [GitHub Pages link]
+Or view it live: https://christophsiegenthaler.github.io/SanzoWada/
 
 ## Controls
 
