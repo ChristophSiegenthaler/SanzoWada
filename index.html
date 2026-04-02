@@ -1,19 +1,32 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg-primary: var(--color-background-primary);
-    --bg-secondary: var(--color-background-secondary);
-    --bg-tertiary: var(--color-background-tertiary);
-    --text-primary: var(--color-text-primary);
-    --text-secondary: var(--color-text-secondary);
-    --text-tertiary: var(--color-text-tertiary);
-    --border-t: var(--color-border-tertiary);
-    --border-s: var(--color-border-secondary);
-    --r-md: var(--border-radius-md);
-    --r-lg: var(--border-radius-lg);
+    --bg-primary: #faf9f7;
+    --bg-secondary: #f0ede8;
+    --bg-tertiary: #e8e4de;
+    --text-primary: #1a1815;
+    --text-secondary: #6b6560;
+    --text-tertiary: #9e9890;
+    --border-t: rgba(0,0,0,0.08);
+    --border-s: rgba(0,0,0,0.18);
+    --r-md: 6px;
+    --r-lg: 10px;
+  }
+  html[data-theme="dark"] {
+    --bg-primary: #1c1a18;
+    --bg-secondary: #242220;
+    --bg-tertiary: #141210;
+    --text-primary: #f0ede8;
+    --text-secondary: #9e9890;
+    --text-tertiary: #6b6560;
+    --border-t: rgba(255,255,255,0.07);
+    --border-s: rgba(255,255,255,0.14);
   }
   body { background: var(--bg-tertiary); color: var(--text-primary); font-family: Georgia, serif; padding: 2rem 1rem; }
-  #root { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
+  #root { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; position: relative; }
+  .theme-btn { position: absolute; top: 0; right: 0; background: transparent; border: 0.5px solid var(--border-s); color: var(--text-secondary); font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 0.08em; padding: 5px 10px; border-radius: var(--r-md); cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .theme-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  body { transition: background 0.2s, color 0.2s; }
   .eyebrow { font-size: 11px; letter-spacing: 0.14em; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.3rem; font-family: 'Courier New', monospace; }
   h2 { font-size: 26px; font-weight: 400; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
   .subtitle { font-size: 13px; color: var(--text-tertiary); margin-bottom: 2rem; font-style: italic; }
@@ -56,6 +69,7 @@
 </style>
 
 <div id="root">
+  <button class="theme-btn" id="themeBtn" aria-label="Toggle theme"></button>
   <p class="eyebrow">Inspired by Sanzo Wada · A Dictionary of Color Combinations, 1933</p>
   <h2>Color Combination Explorer</h2>
   <p class="subtitle">Click the wheel to set a base color. Drag to explore. Click any swatch or hex chip to copy.</p>
@@ -462,6 +476,25 @@ document.getElementById('hueRangeSlider').addEventListener('input', e => {
   document.getElementById('hueRangeVal').textContent = hueRange;
   renderCombos();
 });
+
+// Theme
+(function() {
+  const html = document.documentElement;
+  const btn = document.getElementById('themeBtn');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let theme = stored || (prefersDark ? 'dark' : 'light');
+
+  function applyTheme(t) {
+    theme = t;
+    html.setAttribute('data-theme', t);
+    btn.textContent = t === 'dark' ? '☀ Light' : '☾ Dark';
+    localStorage.setItem('theme', t);
+  }
+
+  btn.addEventListener('click', () => applyTheme(theme === 'dark' ? 'light' : 'dark'));
+  applyTheme(theme);
+})();
 
 drawWheel();
 update();
