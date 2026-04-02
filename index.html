@@ -1,318 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sanzo Wada — Color Combination Explorer</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f4f3ef;
-    --bg-tertiary: #eceae4;
-    --text-primary: #1a1a18;
-    --text-secondary: #6b6a65;
-    --text-tertiary: #a8a7a2;
-    --border-tertiary: rgba(0,0,0,0.12);
-    --border-secondary: rgba(0,0,0,0.22);
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --font-sans: 'Georgia', serif;
-    --font-mono: 'Courier New', monospace;
+    --bg-primary: var(--color-background-primary);
+    --bg-secondary: var(--color-background-secondary);
+    --bg-tertiary: var(--color-background-tertiary);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-tertiary: var(--color-text-tertiary);
+    --border-t: var(--color-border-tertiary);
+    --border-s: var(--color-border-secondary);
+    --r-md: var(--border-radius-md);
+    --r-lg: var(--border-radius-lg);
   }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg-primary: #1c1c1a;
-      --bg-secondary: #252523;
-      --bg-tertiary: #2e2e2b;
-      --text-primary: #f0ede6;
-      --text-secondary: #9e9d97;
-      --text-tertiary: #6a6965;
-      --border-tertiary: rgba(255,255,255,0.1);
-      --border-secondary: rgba(255,255,255,0.2);
-    }
-  }
-
-  body {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    font-family: var(--font-sans);
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
-
-  #root {
-    max-width: 860px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    margin-bottom: 0.3rem;
-    font-weight: 400;
-    font-family: 'Courier New', monospace;
-  }
-
-  h2 {
-    font-size: 26px;
-    font-weight: 400;
-    color: var(--text-primary);
-    margin-bottom: 0.35rem;
-    letter-spacing: -0.01em;
-  }
-
-  .subtitle {
-    font-size: 13px;
-    color: var(--text-tertiary);
-    margin-bottom: 2rem;
-    font-style: italic;
-  }
-
-  .controls {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-end;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .ctrl-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .ctrl-label {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    font-weight: 400;
-    font-family: 'Courier New', monospace;
-  }
-
-  .count-btns {
-    display: flex;
-    gap: 5px;
-  }
-
-  .count-btn {
-    width: 36px;
-    height: 36px;
-    border: 0.5px solid var(--border-secondary);
-    background: transparent;
-    color: var(--text-primary);
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .count-btn.active {
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    border-color: var(--text-primary);
-  }
-
-  .count-btn:hover:not(.active) {
-    background: var(--bg-secondary);
-  }
-
-  .harmony-select {
-    height: 36px;
-    padding: 0 10px;
-    border: 0.5px solid var(--border-secondary);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    outline: none;
-  }
-
-  .main {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 2.5rem;
-    align-items: start;
-  }
-
-  .wheel-wrap {
-    position: relative;
-    width: 280px;
-    height: 280px;
-    cursor: crosshair;
-    flex-shrink: 0;
-  }
-
-  #colorWheel {
-    border-radius: 50%;
-    display: block;
-  }
-
-  .marker {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid white;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
-    transition: left 0.15s, top 0.15s;
-  }
-
-  .swatch-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .swatch-row {
-    display: flex;
-    gap: 0;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    height: 88px;
-    border: 0.5px solid var(--border-tertiary);
-  }
-
-  .swatch {
-    flex: 1;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 8px;
-    transition: flex 0.25s ease;
-    cursor: pointer;
-  }
-
+  body { background: var(--bg-tertiary); color: var(--text-primary); font-family: Georgia, serif; padding: 2rem 1rem; }
+  #root { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.3rem; font-family: 'Courier New', monospace; }
+  h2 { font-size: 26px; font-weight: 400; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+  .subtitle { font-size: 13px; color: var(--text-tertiary); margin-bottom: 2rem; font-style: italic; }
+  .controls { display: flex; gap: 2rem; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; }
+  .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); font-family: 'Courier New', monospace; }
+  .count-btns { display: flex; gap: 5px; }
+  .count-btn { width: 36px; height: 36px; border: 0.5px solid var(--border-s); background: transparent; color: var(--text-primary); font-family: 'Courier New', monospace; font-size: 14px; border-radius: var(--r-md); cursor: pointer; transition: background 0.15s; }
+  .count-btn.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+  .count-btn:hover:not(.active) { background: var(--bg-secondary); }
+  .harmony-select { height: 36px; padding: 0 10px; border: 0.5px solid var(--border-s); background: var(--bg-primary); color: var(--text-primary); font-family: 'Courier New', monospace; font-size: 12px; border-radius: var(--r-md); cursor: pointer; outline: none; }
+  .main { display: grid; grid-template-columns: 280px 1fr; gap: 2.5rem; align-items: start; }
+  .wheel-wrap { position: relative; width: 280px; height: 280px; cursor: crosshair; flex-shrink: 0; }
+  #colorWheel { border-radius: 50%; display: block; }
+  .marker { position: absolute; border-radius: 50%; border: 2px solid white; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 0 1px rgba(0,0,0,0.3); }
+  .swatch-panel { display: flex; flex-direction: column; gap: 1.25rem; }
+  .swatch-row { display: flex; gap: 0; border-radius: var(--r-lg); overflow: hidden; height: 88px; border: 0.5px solid var(--border-t); }
+  .swatch { flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 8px; transition: flex 0.25s ease; cursor: pointer; }
   .swatch:hover { flex: 1.5; }
-
-  .swatch-label {
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-weight: 400;
-    opacity: 0;
-    transition: opacity 0.2s;
-    white-space: nowrap;
-    font-family: 'Courier New', monospace;
-  }
-
+  .swatch-label { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 400; opacity: 0; transition: opacity 0.2s; white-space: nowrap; font-family: 'Courier New', monospace; }
   .swatch:hover .swatch-label { opacity: 1; }
-
-  .hex-display {
-    font-size: 11px;
-    font-family: 'Courier New', monospace;
-    color: var(--text-secondary);
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .hex-chip {
-    background: var(--bg-secondary);
-    padding: 4px 9px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.15s;
-    border: 0.5px solid var(--border-tertiary);
-    user-select: none;
-  }
-
+  .swatch-copied-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; font-family: 'Courier New', monospace; background: rgba(0,0,0,0.55); color: #fff; padding: 3px 7px; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+  .swatch-copied-badge.show { opacity: 1; }
+  .hex-display { font-size: 11px; font-family: 'Courier New', monospace; color: var(--text-secondary); display: flex; gap: 6px; flex-wrap: wrap; }
+  .hex-chip { background: var(--bg-secondary); padding: 4px 9px; border-radius: 4px; cursor: pointer; transition: background 0.15s; border: 0.5px solid var(--border-t); user-select: none; }
   .hex-chip:hover { background: var(--bg-tertiary); }
   .hex-chip.copied { background: var(--text-primary); color: var(--bg-primary); }
-
   .combos { margin-top: 0.5rem; }
-
-  .combo-label {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
-    font-weight: 400;
-    font-family: 'Courier New', monospace;
-  }
-
-  .combo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 8px;
-  }
-
-  .combo-card {
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 0.5px solid var(--border-tertiary);
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    background: var(--bg-primary);
-  }
-
-  .combo-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  .combo-swatches {
-    display: flex;
-    height: 44px;
-  }
-
-  .combo-name {
-    font-size: 10px;
-    color: var(--text-secondary);
-    padding: 5px 7px;
-    background: var(--bg-primary);
-    letter-spacing: 0.04em;
-    font-family: 'Courier New', monospace;
-  }
-
-  .divider {
-    border: none;
-    border-top: 0.5px solid var(--border-tertiary);
-    margin: 2rem 0;
-  }
-
-  .footer {
-    font-size: 11px;
-    color: var(--text-tertiary);
-    font-style: italic;
-    text-align: center;
-    padding-top: 0.5rem;
-  }
-
-  @media (max-width: 640px) {
-    .main {
-      grid-template-columns: 1fr;
-    }
-    .wheel-wrap {
-      width: 260px;
-      height: 260px;
-      margin: 0 auto;
-    }
-  }
+  .combo-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.75rem; font-family: 'Courier New', monospace; }
+  .combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .combo-card { border-radius: var(--r-md); overflow: hidden; border: 0.5px solid var(--border-t); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; background: var(--bg-primary); }
+  .combo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .combo-swatches { display: flex; height: 44px; }
+  .combo-name { font-size: 10px; color: var(--text-secondary); padding: 5px 7px; background: var(--bg-primary); letter-spacing: 0.04em; font-family: 'Courier New', monospace; }
+  .divider { border: none; border-top: 0.5px solid var(--border-t); margin: 2rem 0; }
+  .footer { font-size: 11px; color: var(--text-tertiary); font-style: italic; text-align: center; padding-top: 0.5rem; }
+  @media (max-width: 640px) { .main { grid-template-columns: 1fr; } .wheel-wrap { width: 260px; height: 260px; margin: 0 auto; } }
 </style>
-</head>
-<body>
+
 <div id="root">
   <p class="eyebrow">Inspired by Sanzo Wada · A Dictionary of Color Combinations, 1933</p>
   <h2>Color Combination Explorer</h2>
-  <p class="subtitle">Click the wheel to set a base color. Drag to explore. Hex codes are copyable.</p>
-
+  <p class="subtitle">Click the wheel to set a base color. Drag to explore. Click any swatch or hex chip to copy.</p>
   <div class="controls">
     <div class="ctrl-group">
       <span class="ctrl-label">Number of colors</span>
@@ -335,22 +79,20 @@
       </select>
     </div>
   </div>
-
   <div class="main">
     <div class="ctrl-group">
       <span class="ctrl-label">Base color</span>
-      <div style="height: 10px;"></div>
+      <div style="height:10px"></div>
       <div class="wheel-wrap" id="wheelWrap">
         <canvas id="colorWheel" width="280" height="280"></canvas>
       </div>
-      <div style="height: 10px;"></div>
+      <div style="height:10px"></div>
       <div class="hex-display" id="hexDisplay"></div>
     </div>
-
     <div class="swatch-panel">
       <div class="ctrl-group">
         <span class="ctrl-label">Current palette</span>
-        <div style="height: 8px;"></div>
+        <div style="height:8px"></div>
         <div class="swatch-row" id="swatchRow"></div>
       </div>
       <div class="combos">
@@ -359,7 +101,6 @@
       </div>
     </div>
   </div>
-
   <hr class="divider">
   <p class="footer">Wada's original work was built around observation of nature and traditional Japanese dyeing —<br>dusty, aged, seasonal tones over pure primaries.</p>
 </div>
@@ -383,11 +124,9 @@ function drawWheel() {
     for (let si = 0; si < satSteps; si++) {
       const s0 = si / satSteps;
       const s1 = (si + 1) / satSteps;
-      const ri = s0 * r;
-      const ro = s1 * r;
       ctx.beginPath();
-      ctx.arc(cx, cy, ro, startAngle, endAngle);
-      ctx.arc(cx, cy, ri, endAngle, startAngle, true);
+      ctx.arc(cx, cy, s1 * r, startAngle, endAngle);
+      ctx.arc(cx, cy, s0 * r, endAngle, startAngle, true);
       ctx.closePath();
       ctx.fillStyle = `hsl(${a}, ${Math.round(s0 * 100)}%, 50%)`;
       ctx.fill();
@@ -421,16 +160,16 @@ function getHarmonyHues(baseHue, count, type) {
     for (let i = 1; i < count; i++) hues.push((baseHue + 30 * i) % 360);
   } else if (type === 'triadic') {
     const steps = [120, 240, 60, 180, 300];
-    for (let i = 1; i < count; i++) hues.push((baseHue + steps[i - 1]) % 360);
+    for (let i = 1; i < count; i++) hues.push((baseHue + steps[i-1]) % 360);
   } else if (type === 'complementary') {
     hues.push((baseHue + 180) % 360);
     const extras = [30, -30, 15, -15];
-    for (let i = 2; i < count; i++) hues.push((baseHue + extras[i - 2] + 360) % 360);
+    for (let i = 2; i < count; i++) hues.push((baseHue + extras[i-2] + 360) % 360);
   } else if (type === 'split') {
     hues.push((baseHue + 150) % 360);
     hues.push((baseHue + 210) % 360);
     const extras = [30, 75];
-    for (let i = 3; i < count; i++) hues.push((baseHue + extras[i - 3]) % 360);
+    for (let i = 3; i < count; i++) hues.push((baseHue + extras[i-3]) % 360);
   } else if (type === 'tetradic') {
     hues.push((baseHue + 90) % 360);
     hues.push((baseHue + 180) % 360);
@@ -438,7 +177,7 @@ function getHarmonyHues(baseHue, count, type) {
     if (count > 4) hues.push((baseHue + 45) % 360);
   } else if (type === 'wada') {
     const offsets = [37, 160, 65, 200];
-    for (let i = 1; i < count; i++) hues.push((baseHue + offsets[i - 1] * (i % 2 === 0 ? -1 : 1) + 360) % 360);
+    for (let i = 1; i < count; i++) hues.push((baseHue + offsets[i-1] * (i % 2 === 0 ? -1 : 1) + 360) % 360);
   }
   return hues.slice(0, count);
 }
@@ -457,17 +196,25 @@ function buildPalette(baseHue, baseSat, count, type) {
   const hues = getHarmonyHues(baseHue, count, type);
   return hues.map((h, i) => {
     const s = i === 0 ? baseSat * 100 : wadaSaturation(i, type) * 100;
-    const l = i === 0 ? 50 : wadaLightness(i, type);
+    const l = 50;
     return { h, s, l, hex: hslToHex(h, s, l) };
   });
 }
 
 function getTextColor(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
   return lum > 0.55 ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.85)';
+}
+
+function copyHexValue(hex, onDone) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(hex).then(onDone);
+  } else {
+    onDone();
+  }
 }
 
 function renderSwatches(palette) {
@@ -477,37 +224,50 @@ function renderSwatches(palette) {
     const s = document.createElement('div');
     s.className = 'swatch';
     s.style.background = c.hex;
+    s.title = 'Click to copy ' + c.hex.toUpperCase();
+
     const lbl = document.createElement('div');
     lbl.className = 'swatch-label';
     lbl.style.color = getTextColor(c.hex);
     lbl.textContent = c.hex.toUpperCase();
     s.appendChild(lbl);
+
+    const badge = document.createElement('div');
+    badge.className = 'swatch-copied-badge';
+    badge.textContent = 'Copied!';
+    s.appendChild(badge);
+
+    s.addEventListener('click', () => {
+      copyHexValue(c.hex, () => {
+        badge.classList.add('show');
+        setTimeout(() => badge.classList.remove('show'), 1200);
+      });
+    });
+
     row.appendChild(s);
   });
 
   const hexDisplay = document.getElementById('hexDisplay');
-  hexDisplay.innerHTML = palette.map(c =>
-    `<span class="hex-chip" onclick="copyHex(this,'${c.hex}')">${c.hex.toUpperCase()}</span>`
-  ).join('');
-}
-
-function copyHex(el, hex) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(hex).then(() => {
-      el.classList.add('copied');
-      el.textContent = 'Copied!';
-      setTimeout(() => {
-        el.classList.remove('copied');
-        el.textContent = hex.toUpperCase();
-      }, 1200);
+  hexDisplay.innerHTML = '';
+  palette.forEach(c => {
+    const chip = document.createElement('span');
+    chip.className = 'hex-chip';
+    chip.textContent = c.hex.toUpperCase();
+    chip.addEventListener('click', () => {
+      copyHexValue(c.hex, () => {
+        chip.classList.add('copied');
+        chip.textContent = 'Copied!';
+        setTimeout(() => {
+          chip.classList.remove('copied');
+          chip.textContent = c.hex.toUpperCase();
+        }, 1200);
+      });
     });
-  }
+    hexDisplay.appendChild(chip);
+  });
 }
 
-const variationNames = [
-  'Spring tints', 'Autumn muted', 'Ink & dust', 'Sea glass',
-  'Wabi warmth', 'Celadon drift'
-];
+const variationNames = ['Spring tints','Autumn muted','Ink & dust','Sea glass','Wabi warmth','Celadon drift'];
 
 function buildVariations(baseHue, count, type) {
   const configs = [
@@ -522,6 +282,56 @@ function buildVariations(baseHue, count, type) {
     const hues = getHarmonyHues(baseHue + vi * 15, count, type);
     const colors = hues.map((h, i) => hslToHex(h, cfg.satMod * (i % 2 === 0 ? 100 : 70), cfg.lightBase + (i % 3) * 8));
     return { name: variationNames[vi], colors };
+  });
+}
+
+function applyCustomPalette(colors) {
+  const row = document.getElementById('swatchRow');
+  row.innerHTML = '';
+  colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'swatch';
+    s.style.background = c;
+    s.title = 'Click to copy ' + c.toUpperCase();
+
+    const lbl = document.createElement('div');
+    lbl.className = 'swatch-label';
+    lbl.style.color = getTextColor(c);
+    lbl.textContent = c.toUpperCase();
+    s.appendChild(lbl);
+
+    const badge = document.createElement('div');
+    badge.className = 'swatch-copied-badge';
+    badge.textContent = 'Copied!';
+    s.appendChild(badge);
+
+    s.addEventListener('click', () => {
+      copyHexValue(c, () => {
+        badge.classList.add('show');
+        setTimeout(() => badge.classList.remove('show'), 1200);
+      });
+    });
+
+    row.appendChild(s);
+  });
+
+  const hexDisplay = document.getElementById('hexDisplay');
+  hexDisplay.innerHTML = '';
+  colors.forEach(c => {
+    const chip = document.createElement('span');
+    chip.className = 'hex-chip';
+    chip.textContent = c.toUpperCase();
+    chip.addEventListener('click', () => {
+      copyHexValue(c, () => {
+        chip.classList.add('copied');
+        chip.textContent = 'Copied!';
+        setTimeout(() => {
+          chip.classList.remove('copied');
+          chip.textContent = c.toUpperCase();
+        }, 1200);
+      });
+    });
+    hexDisplay.appendChild(chip);
   });
 }
 
@@ -543,36 +353,19 @@ function renderCombos(baseHue, count, type) {
     nm.textContent = v.name;
     card.appendChild(swRow);
     card.appendChild(nm);
-    card.addEventListener('click', () => {
-      const row = document.getElementById('swatchRow');
-      row.innerHTML = '';
-      v.colors.forEach(c => {
-        const s = document.createElement('div');
-        s.className = 'swatch';
-        s.style.background = c;
-        const lbl = document.createElement('div');
-        lbl.className = 'swatch-label';
-        lbl.style.color = getTextColor(c);
-        lbl.textContent = c.toUpperCase();
-        s.appendChild(lbl);
-        row.appendChild(s);
-      });
-      document.getElementById('hexDisplay').innerHTML = v.colors.map(c =>
-        `<span class="hex-chip" onclick="copyHex(this,'${c}')">${c.toUpperCase()}</span>`
-      ).join('');
-    });
+    card.addEventListener('click', () => applyCustomPalette(v.colors));
     grid.appendChild(card);
   });
 }
 
 function placeMarkers(palette) {
   document.getElementById('wheelWrap').querySelectorAll('.marker').forEach(m => m.remove());
-  const cx = W / 2, cy = W / 2, r = W / 2 - 4;
+  const cx = W/2, cy = W/2, r = W/2 - 4;
   palette.forEach((c, i) => {
-    const angle = (c.h - 90) * Math.PI / 180;
+    const angleRad = c.h * Math.PI / 180;
     const dist = (c.s / 100) * r;
-    const x = cx + dist * Math.cos(angle);
-    const y = cy + dist * Math.sin(angle);
+    const x = cx + dist * Math.cos(angleRad);
+    const y = cy + dist * Math.sin(angleRad);
     const m = document.createElement('div');
     m.className = 'marker';
     m.style.left = x + 'px';
@@ -596,14 +389,14 @@ function pickFromWheel(e) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = W / rect.width;
   const scaleY = W / rect.height;
-  const x = (e.clientX - rect.left) * scaleX - W / 2;
-  const y = (e.clientY - rect.top) * scaleY - W / 2;
-  const r = W / 2 - 4;
-  const dist = Math.sqrt(x * x + y * y);
+  const x = (e.clientX - rect.left) * scaleX - W/2;
+  const y = (e.clientY - rect.top) * scaleY - W/2;
+  const r = W/2 - 4;
+  const dist = Math.sqrt(x*x + y*y);
   if (dist > r) return;
-  let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
+  let angle = Math.atan2(y, x) * 180 / Math.PI;
   if (angle < 0) angle += 360;
-  selectedHue = angle % 360;
+  selectedHue = angle;
   selectedSat = Math.min(dist / r, 1);
   update();
 }
@@ -632,5 +425,3 @@ document.getElementById('harmonySelect').addEventListener('change', e => {
 drawWheel();
 update();
 </script>
-</body>
-</html>
